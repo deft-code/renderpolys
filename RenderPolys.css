@@ -12,6 +12,12 @@ p {
   color: #333;
 }
 
+#canvas {
+  outline: #f00 solid 1px;
+  box-shadow: 2px 2px 3px black;
+  
+}
+
 #container {
   width: 100%;
   height: 400px;
