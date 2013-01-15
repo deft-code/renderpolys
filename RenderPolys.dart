@@ -1,6 +1,10 @@
 
-#import('dart:html');
-#import('dart:json');
+library renderpolies;
+
+import 'dart:html';
+import 'dart:json';
+import 'dart:math';
+import 'package:box2d/box2d_browser.dart';
 
 final WIDTH = 400;
 final HEIGHT = 300;
@@ -40,7 +44,7 @@ String polys_json() {
 class MyPoint {
   num x;
   num y;
-  
+
   MyPoint( this.x, this.y ){}
 }
 
@@ -54,20 +58,20 @@ class Page {
   Page(CanvasRenderingContext2D this.context) {
     width_ = context.canvas.width;
     height_ = context.canvas.height;
-    
+
   }
-  
+
   DrawPoly(List<MyPoint> points) {
     assert(points.length>2);
-    
+
     context.lineWidth = 2;
     context.fillStyle = 'cornflowerblue';
     context.strokeStyle = 'darkblue';
-    
+
     context.beginPath();
-    
+
     context.moveTo(points[0].x, points[0].y);
-    
+
     for( var i=1; i<points.length; i++) {
       context.lineTo(points[i].x, points[i].y);
     }
@@ -76,32 +80,32 @@ class Page {
     context.closePath();
     context.stroke();
   }
-  
+
   Load(String polys_txt) {
     min_x = double.INFINITY;
     max_x = -min_x;
     min_y = min_x;
     max_y = max_x;
-    
+
     polys = new List<MyPoly>();
     List<Map> parsed_polys = JSON.parse(polys_txt);
     for( var parsed_poly in parsed_polys) {
       var points = new List<MyPoint>();
       assert(parsed_poly["points"].length>2);
       for(Map v in parsed_poly["points"]) {
-        var x = v["x"];
-        var y = v["y"];
-        min_x = Math.min(min_x, x);
-        max_x = Math.max(max_x, x);
-        min_y = Math.min(min_y, y);
-        max_y = Math.max(max_y, y);
+        num x = v["x"];
+        num y = v["y"];
+        min_x = min(min_x, x);
+        max_x = max(max_x, x);
+        min_y = min(min_y, y);
+        max_y = max(max_y, y);
         points.addLast(new MyPoint(x, y));
       }
       polys.add(new MyPoly(points));
     }
   }
-  
-  void SetView(num x, num y, [num width, num height]) {
+
+  void SetView(num x, num y, {num width, num height}) {
     context.clearRect(0, 0, width_, height_);
     //context.scale(1, -1);
     var scale = width_/width;
@@ -113,9 +117,9 @@ class Page {
     context.transform(scale, 0, 0, -scale, 0, 0);
     context.translate(-dx, -dy-height_);
 
-    
+
   }
-  
+
   Draw() {
     SetView(center_x, center_y, width: max_x-min_x);
     for( var poly in polys) {
@@ -124,10 +128,10 @@ class Page {
     print("minmax x: $min_x, $max_x");
     print("minmax y: $min_y, $max_y");
   }
-  
-  num get center_x() => min_x + (max_x-min_x)/2;
-  num get center_y() => min_y + (max_y-min_y)/2;
-  
+
+  num get center_x => min_x + (max_x-min_x)/2;
+  num get center_y => min_y + (max_y-min_y)/2;
+
   CanvasRenderingContext2D context;
   List<MyPoly> polys;
   num min_x;
