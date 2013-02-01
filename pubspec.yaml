@@ -1,0 +1,8 @@
+name: renderpolies
+description: First attempt at a simple Polygon rendering Solution
+dependencies:
+  box2d: any
+  browser: any
+
+#  js: any
+#  unittest: any

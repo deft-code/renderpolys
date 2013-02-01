@@ -8,8 +8,8 @@ import 'package:box2d/box2d_browser.dart';
 
 final WIDTH = 400;
 final HEIGHT = 300;
-final CENTER_X = WIDTH/2;
-final CENTER_Y = HEIGHT/2;
+final CENTER_X = 0;//WIDTH/2;
+final CENTER_Y = 0;//HEIGHT/2;
 
 String polys_json() {
   return """
@@ -58,7 +58,6 @@ class Page {
   Page(CanvasRenderingContext2D this.context) {
     width_ = context.canvas.width;
     height_ = context.canvas.height;
-
   }
 
   DrawPoly(List<MyPoint> points) {
@@ -88,7 +87,7 @@ class Page {
     max_y = max_x;
 
     polys = new List<MyPoly>();
-    List<Map> parsed_polys = JSON.parse(polys_txt);
+    List<Map> parsed_polys = parse(polys_txt);
     for( var parsed_poly in parsed_polys) {
       var points = new List<MyPoint>();
       assert(parsed_poly["points"].length>2);
@@ -107,20 +106,18 @@ class Page {
 
   void SetView(num x, num y, {num width, num height}) {
     context.clearRect(0, 0, width_, height_);
-    //context.scale(1, -1);
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    var w = width_/2;
+    var h = height_/2;
+    context.translate(w, h);
+    context.translate(x, y);
     var scale = width_/width;
-    var dx = width_/2 - x;
-    var dy = height_/2 - y;
     print("scale: $scale");
-    dx *= scale;
-    dy *= scale;
-    context.transform(scale, 0, 0, -scale, 0, 0);
-    context.translate(-dx, -dy-height_);
-
-
+    context.scale(scale, -scale);
   }
 
   Draw() {
+    print("center: (${center_x},${center_y})");
     SetView(center_x, center_y, width: max_x-min_x);
     for( var poly in polys) {
       DrawPoly( poly.points);
